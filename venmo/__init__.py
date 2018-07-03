@@ -10,6 +10,7 @@ logging.getLogger('requests').setLevel(logging.WARNING)
 
 from . import (  # noqa: F401
     auth,
+    balance,
     cli,
     cookies,
     payment,

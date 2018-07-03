@@ -66,6 +66,9 @@ def parse_args():
         subparser.add_argument('note', help='what the request is for')
         subparser.set_defaults(func=getattr(venmo.payment, action))
 
+    parser_balance = subparsers.add_parser('balance', help='get venmo balance')
+    parser_balance.set_defaults(func=venmo.balance.balance)
+
     parser_configure = subparsers.add_parser('configure',
                                              help='set up credentials')
     parser_configure.set_defaults(func=venmo.auth.configure)
