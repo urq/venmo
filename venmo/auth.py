@@ -139,19 +139,6 @@ def extract_otp_secret(text):
     raise Exception('msg="Could not extract data-otp-secret"')
 
 
-def retrieve_access_token(code):
-    data = {
-        'client_id': venmo.settings.CLIENT_ID,
-        'client_secret': venmo.settings.CLIENT_SECRET,
-        'code': code,
-    }
-    response = venmo.singletons.session().post(venmo.settings.ACCESS_TOKEN_URL,
-                                               data)
-    response_dict = response.json()
-    access_token = response_dict['access_token']
-    return access_token
-
-
 def _authorization_url():
     scopes = [
         'make_payments',

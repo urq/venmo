@@ -3,7 +3,6 @@ import os
 
 # OAuth
 CLIENT_ID = '2667'
-CLIENT_SECRET = 'srDrmU3yf452HuFF63HqHEt25pa5DexZ'
 
 # Paths
 DOT_VENMO = os.path.join(os.path.expanduser('~'), '.venmo')
