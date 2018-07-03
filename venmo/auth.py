@@ -39,6 +39,9 @@ def configure():
     First, set username and password. If those change, then get access token.
     If that fails, unset username and password.
 
+    Also optionally save a bank account ID if you want to transfer funds from
+    venmo to your bank account.
+
     Return whether or not we save an access token.
     '''
     # Update credentials
@@ -46,7 +49,7 @@ def configure():
     if not credentials:
         return False
     else:
-        email, password = credentials
+        email, password, bank_account_id = credentials
 
     # Log in to Auto
     success = submit_credentials(email, password)
@@ -60,10 +63,11 @@ def configure():
         logger.error('invalid credentials')
         return False
 
-    # Write email password
+    # Write email password bank_account_id
     config = read_config()
     config.set(configparser.DEFAULTSECT, 'email', email)
     config.set(configparser.DEFAULTSECT, 'password', password)
+    config.set(configparser.DEFAULTSECT, 'bank_account_id', bank_account_id)
     write_config(config)
 
     # Do 2FA
@@ -175,7 +179,7 @@ def _filter_tag(input_xml, tag):
 
 
 def update_credentials():
-    '''Save username and password to config file.
+    '''Save username, password, and bank_account_id to config file.
 
     Entering nothing keeps the current credentials. Returns whether or not
     the credentials changed.
@@ -190,21 +194,38 @@ def update_credentials():
         old_password = config.get(configparser.DEFAULTSECT, 'password')
     except configparser.NoOptionError:
         old_password = ''
+    try:
+        old_bank_account_id = config.get(configparser.DEFAULTSECT,
+                                         'bank_account_id')
+    except configparser.NoOptionError:
+        old_bank_account_id = ''
 
     # Prompt new credentials
     email = input('Venmo email [{}]: '
                   .format(old_email if old_email else None))
     password = getpass.getpass(prompt='Venmo password [{}]: '
                                .format('*' * 10 if old_password else None))
+    bank_account_id = getpass.getpass(
+        prompt=('Bank Account ID (Optional, see '
+                'https://github.com/zackhsi/venmo/blob/master/README.rst for '
+                'instructions) [{}]: ').format('*' * 10
+                                               if old_bank_account_id
+                                               else None))
+
     email = email or old_email
     password = password or old_password
+    bank_account_id = bank_account_id or old_bank_account_id
 
     incomplete = not email or not password
     if incomplete:
         logger.warn('credentials incomplete')
         return False
 
-    return email, password
+    if not bank_account_id:
+        logger.warn('bank_account_id not set. Cannot transfer venmo funds to '
+                    'bank.')
+
+    return email, password, bank_account_id
 
 
 def submit_credentials(email, password):
@@ -263,6 +284,14 @@ def get_access_token():
     config = read_config()
     try:
         return config.get(configparser.DEFAULTSECT, 'access_token')
+    except configparser.NoOptionError:
+        return None
+
+
+def get_bank_account_id():
+    config = read_config()
+    try:
+        return config.get(configparser.DEFAULTSECT, 'bank_account_id')
     except configparser.NoOptionError:
         return None
 

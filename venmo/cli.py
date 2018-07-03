@@ -83,6 +83,13 @@ def parse_args():
     parser_reset = subparsers.add_parser('reset', help='reset saved data')
     parser_reset.set_defaults(func=venmo.auth.reset)
 
+    parser_transfer = subparsers.add_parser('transfer', help=('transfer funds '
+                                                              'to bank acct'))
+    parser_transfer.add_argument('amount', help=('the amount to transfer from'
+                                                 ' your venmo balance to the '
+                                                 'specified bank account'))
+    parser_transfer.set_defaults(func=venmo.transfer.transfer)
+
     parser.add_argument('-v', '--version', action='version',
                         version='%(prog)s ' + venmo.__version__)
 

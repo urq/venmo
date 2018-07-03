@@ -16,6 +16,7 @@ from . import (  # noqa: F401
     payment,
     settings,
     singletons,
+    transfer,
     types,
     user
 )
